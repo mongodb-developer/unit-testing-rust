@@ -3,6 +3,10 @@ pub struct Supervillain {
     pub last_name: String,
 }
 
+pub trait Megaweapon {
+    fn shoot(&self);
+}
+
 impl Supervillain {
     pub fn full_name(&self) -> String {
         format!("{} {}", self.first_name, self.last_name)
@@ -11,6 +15,9 @@ impl Supervillain {
         let components = name.split(" ").collect::<Vec<_>>();
         self.first_name = components[0].to_string();
         self.last_name = components[1].to_string();
+    }
+    pub fn attack(&self, weapon: impl Megaweapon) {
+        weapon.shoot();
     }
 }
 
@@ -26,6 +33,8 @@ impl From<&str> for Supervillain {
 
 #[cfg(test)]
 mod tests {
+    use std::cell::RefCell;
+
     use super::*;
 
     #[test]
@@ -62,5 +71,40 @@ mod tests {
         // Assert
         assert_eq!(sut.first_name, "Darth");
         assert_eq!(sut.last_name, "Vader");
+    }
+    #[test]
+    fn attack_shoots_weapon() {
+        // Arrange
+        let sut = Supervillain {
+            first_name: "Lex".to_string(),
+            last_name: "Luthor".to_string(),
+        };
+        let weapon = WeaponDouble::new();
+        // Act
+        sut.attack(weapon);
+        // Assert
+        // assert!(weapon.is_shot);
+    }
+    struct WeaponDouble {
+        pub is_shot: RefCell<bool>,
+    }
+    impl WeaponDouble {
+        fn new() -> WeaponDouble {
+            WeaponDouble {
+                is_shot: RefCell::new(false),
+            }
+        }
+    }
+    impl Megaweapon for WeaponDouble {
+        fn shoot(&self) {
+            *self.is_shot.borrow_mut() = true;
+        }
+    }
+    impl Drop for WeaponDouble {
+        fn drop(&mut self) {
+            if *self.is_shot.borrow() != true {
+                panic!("Failed to call shoot()");
+            }
+        }
     }
 }
