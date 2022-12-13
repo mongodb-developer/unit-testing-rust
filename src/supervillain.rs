@@ -14,6 +14,16 @@ impl Supervillain {
     }
 }
 
+impl From<&str> for Supervillain {
+    fn from(name: &str) -> Self {
+        let components = name.split(" ").collect::<Vec<_>>();
+        Supervillain {
+            first_name: components[0].to_string(),
+            last_name: components[1].to_string(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -39,6 +49,16 @@ mod tests {
         };
         // Act
         sut.set_full_name("Darth Vader");
+        // Assert
+        assert_eq!(sut.first_name, "Darth");
+        assert_eq!(sut.last_name, "Vader");
+    }
+    #[test]
+    fn from_str_slice_produces_supervillain_with_first_and_last_name() {
+        // Arrange
+
+        // Act
+        let sut = Supervillain::from("Darth Vader");
         // Assert
         assert_eq!(sut.first_name, "Darth");
         assert_eq!(sut.last_name, "Vader");
