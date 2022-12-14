@@ -37,47 +37,54 @@ mod tests {
 
     use super::*;
 
+    const PRIMARY_FIRST_NAME: &str = "Lex";
+    const PRIMARY_LAST_NAME: &str = "Luthor";
+    const PRIMARY_FULL_NAME: &str = "Lex Luthor";
+    const SECONDARY_FIRST_NAME: &str = "Darth";
+    const SECONDARY_LAST_NAME: &str = "Vader";
+    const SECONDARY_FULL_NAME: &str = "Darth Vader";
+
     #[test]
     fn full_name_is_first_name_space_last_name() {
         // Arrange
         let sut = Supervillain {
-            first_name: "Lex".to_string(),
-            last_name: "Luthor".to_string(),
+            first_name: PRIMARY_FIRST_NAME.to_string(),
+            last_name: PRIMARY_LAST_NAME.to_string(),
         };
         // Act
         let full_name = sut.full_name();
         // Assert
-        assert_eq!(full_name, "Lex Luthor", "Unexpected full name");
+        assert_eq!(full_name, PRIMARY_FULL_NAME);
     }
     #[test]
     fn set_full_name_sets_first_and_last_name() {
         // Arrange
         let mut sut = Supervillain {
-            first_name: "Lex".to_string(),
-            last_name: "Luthor".to_string(),
+            first_name: PRIMARY_FIRST_NAME.to_string(),
+            last_name: PRIMARY_LAST_NAME.to_string(),
         };
         // Act
-        sut.set_full_name("Darth Vader");
+        sut.set_full_name(SECONDARY_FULL_NAME);
         // Assert
-        assert_eq!(sut.first_name, "Darth");
-        assert_eq!(sut.last_name, "Vader");
+        assert_eq!(sut.first_name, SECONDARY_FIRST_NAME);
+        assert_eq!(sut.last_name, SECONDARY_LAST_NAME);
     }
     #[test]
     fn from_str_slice_produces_supervillain_with_first_and_last_name() {
         // Arrange
 
         // Act
-        let sut = Supervillain::from("Darth Vader");
+        let sut = Supervillain::from(SECONDARY_FULL_NAME);
         // Assert
-        assert_eq!(sut.first_name, "Darth");
-        assert_eq!(sut.last_name, "Vader");
+        assert_eq!(sut.first_name, SECONDARY_FIRST_NAME);
+        assert_eq!(sut.last_name, SECONDARY_LAST_NAME);
     }
     #[test]
     fn attack_shoots_weapon() {
         // Arrange
         let sut = Supervillain {
-            first_name: "Lex".to_string(),
-            last_name: "Luthor".to_string(),
+            first_name: PRIMARY_FIRST_NAME.to_string(),
+            last_name: PRIMARY_LAST_NAME.to_string(),
         };
         let weapon = WeaponDouble::new();
         // Act
