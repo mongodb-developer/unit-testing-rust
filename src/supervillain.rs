@@ -33,7 +33,7 @@ impl From<&str> for Supervillain {
 
 #[cfg(test)]
 mod tests {
-    use std::cell::RefCell;
+    use std::{cell::RefCell, panic};
 
     use super::*;
 
@@ -46,15 +46,12 @@ mod tests {
 
     #[test]
     fn full_name_is_first_name_space_last_name() {
-        // Arrange
-        let sut = Supervillain {
-            first_name: PRIMARY_FIRST_NAME.to_string(),
-            last_name: PRIMARY_LAST_NAME.to_string(),
-        };
-        // Act
-        let full_name = sut.full_name();
-        // Assert
-        assert_eq!(full_name, PRIMARY_FULL_NAME);
+        run_test(|ctx| {
+            // Act
+            let full_name = ctx.sut.full_name();
+            // Assert
+            assert_eq!(full_name, PRIMARY_FULL_NAME);
+        });
     }
     #[test]
     fn set_full_name_sets_first_and_last_name() {
@@ -105,6 +102,32 @@ mod tests {
     impl Megaweapon for WeaponDouble {
         fn shoot(&self) {
             *self.is_shot.borrow_mut() = true;
+        }
+    }
+    struct Context {
+        sut: Supervillain,
+    }
+    impl Context {
+        fn setup() -> Context {
+            Context {
+                sut: Supervillain {
+                    first_name: PRIMARY_FIRST_NAME.to_string(),
+                    last_name: PRIMARY_LAST_NAME.to_string(),
+                },
+            }
+        }
+        fn teardown(self) {}
+    }
+    fn run_test<T>(tst: T)
+    where
+        T: FnOnce(&mut Context) -> () + panic::UnwindSafe,
+    {
+        let mut ctx = Context::setup();
+        let mut wrapper = panic::AssertUnwindSafe(&mut ctx);
+        let result = panic::catch_unwind(move || tst(*wrapper));
+        ctx.teardown();
+        if let Err(err) = result {
+            std::panic::resume_unwind(err);
         }
     }
 }
