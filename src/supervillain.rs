@@ -33,7 +33,9 @@ impl From<&str> for Supervillain {
 
 #[cfg(test)]
 mod tests {
-    use std::{cell::RefCell, panic};
+    use std::cell::RefCell;
+
+    use test_context::{test_context, TestContext};
 
     use super::*;
 
@@ -44,48 +46,38 @@ mod tests {
     const SECONDARY_LAST_NAME: &str = "Vader";
     const SECONDARY_FULL_NAME: &str = "Darth Vader";
 
+    #[test_context(Context)]
     #[test]
-    fn full_name_is_first_name_space_last_name() {
-        run_test(|ctx| {
-            // Act
-            let full_name = ctx.sut.full_name();
-            // Assert
-            assert_eq!(full_name, PRIMARY_FULL_NAME);
-        });
-    }
-    #[test]
-    fn set_full_name_sets_first_and_last_name() {
-        // Arrange
-        let mut sut = Supervillain {
-            first_name: PRIMARY_FIRST_NAME.to_string(),
-            last_name: PRIMARY_LAST_NAME.to_string(),
-        };
+    fn full_name_returns_first_name_space_last_name(ctx: &mut Context) {
         // Act
-        sut.set_full_name(SECONDARY_FULL_NAME);
+        let full_name = ctx.sut.full_name();
         // Assert
-        assert_eq!(sut.first_name, SECONDARY_FIRST_NAME);
-        assert_eq!(sut.last_name, SECONDARY_LAST_NAME);
+        assert_eq!(full_name, PRIMARY_FULL_NAME);
+    }
+    #[test_context(Context)]
+    #[test]
+    fn set_full_name_sets_first_and_last_name(ctx: &mut Context) {
+        // Act
+        ctx.sut.set_full_name(SECONDARY_FULL_NAME);
+        // Assert
+        assert_eq!(ctx.sut.first_name, SECONDARY_FIRST_NAME);
+        assert_eq!(ctx.sut.last_name, SECONDARY_LAST_NAME);
     }
     #[test]
     fn from_str_slice_produces_supervillain_with_first_and_last_name() {
-        // Arrange
-
         // Act
         let sut = Supervillain::from(SECONDARY_FULL_NAME);
         // Assert
         assert_eq!(sut.first_name, SECONDARY_FIRST_NAME);
         assert_eq!(sut.last_name, SECONDARY_LAST_NAME);
     }
+    #[test_context(Context)]
     #[test]
-    fn attack_shoots_weapon() {
+    fn attack_shoots_weapon(ctx: &mut Context) {
         // Arrange
-        let sut = Supervillain {
-            first_name: PRIMARY_FIRST_NAME.to_string(),
-            last_name: PRIMARY_LAST_NAME.to_string(),
-        };
         let weapon = WeaponDouble::new();
         // Act
-        sut.attack(&weapon);
+        ctx.sut.attack(&weapon);
         // Assert
         assert!(*weapon.is_shot.borrow());
     }
@@ -107,7 +99,7 @@ mod tests {
     struct Context {
         sut: Supervillain,
     }
-    impl Context {
+    impl TestContext for Context {
         fn setup() -> Context {
             Context {
                 sut: Supervillain {
@@ -117,17 +109,5 @@ mod tests {
             }
         }
         fn teardown(self) {}
-    }
-    fn run_test<T>(tst: T)
-    where
-        T: FnOnce(&mut Context) -> () + panic::UnwindSafe,
-    {
-        let mut ctx = Context::setup();
-        let mut wrapper = panic::AssertUnwindSafe(&mut ctx);
-        let result = panic::catch_unwind(move || tst(*wrapper));
-        ctx.teardown();
-        if let Err(err) = result {
-            std::panic::resume_unwind(err);
-        }
     }
 }
