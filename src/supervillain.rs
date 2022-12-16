@@ -13,6 +13,9 @@ impl Supervillain {
     }
     pub fn set_full_name(&mut self, name: &str) {
         let components = name.split(" ").collect::<Vec<_>>();
+        if components.len() != 2 {
+            panic!("Name must have first and last name");
+        }
         self.first_name = components[0].to_string();
         self.last_name = components[1].to_string();
     }
@@ -55,6 +58,16 @@ mod tests {
         // Assert
         assert_eq!(ctx.sut.first_name, test_common::SECONDARY_FIRST_NAME);
         assert_eq!(ctx.sut.last_name, test_common::SECONDARY_LAST_NAME);
+    }
+    #[test_context(Context)]
+    #[test]
+    #[should_panic(expected = "Name must have first and last name")]
+    fn set_full_name_panics_with_empty_name(ctx: &mut Context) {
+        // Arrange
+
+        // Act
+        ctx.sut.set_full_name("");
+        // Assert
     }
     #[test]
     fn from_str_slice_produces_supervillain_with_first_and_last_name() {
