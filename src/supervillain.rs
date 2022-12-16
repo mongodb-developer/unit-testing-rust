@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use anyhow::anyhow;
 
 pub struct Supervillain {
@@ -24,6 +26,10 @@ impl Supervillain {
     pub fn attack(&self, weapon: &impl Megaweapon) {
         weapon.shoot();
     }
+    pub async fn come_up_with_plan(&self) -> String {
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        String::from("Take over the world!")
+    }
 }
 
 impl TryFrom<&str> for Supervillain {
@@ -47,7 +53,7 @@ mod tests {
 
     use super::*;
     use crate::test_common;
-    use test_context::{test_context, TestContext};
+    use test_context::{test_context, AsyncTestContext, TestContext};
 
     #[test_context(Context)]
     #[test]
@@ -103,6 +109,11 @@ mod tests {
         // Assert
         assert!(*weapon.is_shot.borrow());
     }
+    #[test_context(AsyncContext)]
+    #[tokio::test]
+    async fn plan_is_sadly_expected(ctx: &mut AsyncContext) {
+        assert_eq!(ctx.sut.come_up_with_plan().await, "Take over the world!");
+    }
     struct WeaponDouble {
         pub is_shot: RefCell<bool>,
     }
@@ -131,5 +142,20 @@ mod tests {
             }
         }
         fn teardown(self) {}
+    }
+    struct AsyncContext {
+        sut: Supervillain,
+    }
+    #[async_trait::async_trait]
+    impl AsyncTestContext for AsyncContext {
+        async fn setup() -> AsyncContext {
+            AsyncContext {
+                sut: Supervillain {
+                    first_name: test_common::PRIMARY_FIRST_NAME.to_string(),
+                    last_name: test_common::PRIMARY_LAST_NAME.to_string(),
+                },
+            }
+        }
+        async fn teardown(self) {}
     }
 }
