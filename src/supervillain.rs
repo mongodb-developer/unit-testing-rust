@@ -77,13 +77,14 @@ mod tests {
         // Assert
     }
     #[test]
-    fn from_str_slice_produces_supervillain_with_first_and_last_name() {
+    fn from_str_slice_produces_supervillain_with_first_and_last_name() -> Result<(), anyhow::Error>
+    {
         // Act
-        let result = Supervillain::try_from(test_common::SECONDARY_FULL_NAME);
+        let sut = Supervillain::try_from(test_common::SECONDARY_FULL_NAME)?;
         // Assert
-        let Ok(sut) = result else { panic!("Unexpected error returned by try_from"); };
         assert_eq!(sut.first_name, test_common::SECONDARY_FIRST_NAME);
         assert_eq!(sut.last_name, test_common::SECONDARY_LAST_NAME);
+        Ok(())
     }
     #[test]
     fn from_str_slice_produces_error_with_less_than_two_substrings() {
