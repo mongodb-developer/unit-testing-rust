@@ -33,6 +33,7 @@ impl Supervillain {
     }
     pub fn set_full_name(&mut self, name: &str) {
         let components = name.split(" ").collect::<Vec<_>>();
+        println!("Received {} components.", components.len());
         if components.len() != 2 {
             panic!("Name must have first and last name");
         }
