@@ -1,7 +1,10 @@
+#![allow(missing_docs)]
+//! Module for supervillains and their related stuff
 use std::time::Duration;
 
 use anyhow::anyhow;
 
+/// Type that represents supervillains.
 pub struct Supervillain {
     pub first_name: String,
     pub last_name: String,
@@ -12,6 +15,19 @@ pub trait Megaweapon {
 }
 
 impl Supervillain {
+    /// Return the value of the full name as a single string.
+    ///
+    /// Full name is produced concatenating first name, a single space, and the last name.
+    ///
+    /// # Examples
+    /// ```
+    /// # use evil::supervillain::Supervillain;
+    /// let lex = Supervillain {
+    ///     first_name: "Lex".to_string(),
+    ///     last_name: "Luthor".to_string(),
+    /// };
+    /// assert_eq!(lex.full_name(), "Lex Luthor");
+    /// ```
     pub fn full_name(&self) -> String {
         format!("{} {}", self.first_name, self.last_name)
     }
