@@ -1,7 +1,10 @@
+#![allow(missing_docs)]
+//! Module for supervillains and their related stuff
 use std::time::Duration;
 
 use anyhow::anyhow;
 
+/// Type that represents supervillains.
 pub struct Supervillain {
     pub first_name: String,
     pub last_name: String,
@@ -12,11 +15,25 @@ pub trait Megaweapon {
 }
 
 impl Supervillain {
+    /// Return the value of the full name as a single string.
+    ///
+    /// Full name is produced concatenating first name, a single space, and the last name.
+    ///
+    /// # Examples
+    /// ```
+    /// # use evil::supervillain::Supervillain;
+    /// let lex = Supervillain {
+    ///     first_name: "Lex".to_string(),
+    ///     last_name: "Luthor".to_string(),
+    /// };
+    /// assert_eq!(lex.full_name(), "Lex Luthor");
+    /// ```
     pub fn full_name(&self) -> String {
         format!("{} {}", self.first_name, self.last_name)
     }
     pub fn set_full_name(&mut self, name: &str) {
         let components = name.split(" ").collect::<Vec<_>>();
+        println!("Received {} components.", components.len());
         if components.len() != 2 {
             panic!("Name must have first and last name");
         }
@@ -73,6 +90,7 @@ mod tests {
         assert_eq!(ctx.sut.last_name, test_common::SECONDARY_LAST_NAME);
     }
     #[test_context(Context)]
+    #[ignore]
     #[test]
     #[should_panic(expected = "Name must have first and last name")]
     fn set_full_name_panics_with_empty_name(ctx: &mut Context) {
@@ -93,6 +111,7 @@ mod tests {
         Ok(())
     }
     #[test]
+    #[ignore]
     fn from_str_slice_produces_error_with_less_than_two_substrings() {
         // Act
         let result = Supervillain::try_from("");
